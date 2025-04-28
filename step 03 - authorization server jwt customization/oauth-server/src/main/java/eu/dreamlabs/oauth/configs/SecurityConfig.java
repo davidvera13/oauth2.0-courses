@@ -15,12 +15,16 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -29,7 +33,9 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Configuration
@@ -55,19 +61,17 @@ public class SecurityConfig {
         return http
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
-                        authorizationServer
-                                .oidc(Customizer.withDefaults()))	// Enable OpenID Connect 1.0
+                        authorizationServer.oidc(Customizer.withDefaults()))	// Enable OpenID Connect 1.0
                 .authorizeHttpRequests((authorize) ->
                         authorize.anyRequest().authenticated())
-                // Redirect to the login page when not authenticated from the
-                // authorization endpoint
+                // Redirect to the login page when not authenticated from the authorization endpoint
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
                 // Accept access tokens for User Info and/or Client Registration
-                .oauth2ResourceServer((resourceServer) -> resourceServer
-                        .jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer((resourceServer) ->
+                        resourceServer.jwt(Customizer.withDefaults()))
                 .build();
     }
 
@@ -87,22 +91,37 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clients").permitAll()
                         .anyRequest().authenticated())
-                // Form login handles the redirect to the login page from the
-                // authorization server filter chain
+                // Form login handles the redirect to the login page from the authorization server filter chain
                 .csrf(csrfConfigurer ->
                         csrfConfigurer.ignoringRequestMatchers("/auth", "/clients"))
                 .formLogin(Customizer.withDefaults())
                 .build();
     }
 
-
-
+    /**
+     * We want to define JWT with custom claims
+     * @return OAuth2TokenCustomizer
+     */
     @Bean
-    public ClientSettings clientSettings() {
-        return ClientSettings.builder()
-                //.requireAuthorizationConsent(Boolean.TRUE)
-                .requireProofKey(Boolean.TRUE)
-                .build();
+    public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer(){
+        return context -> {
+            Authentication principalUser = context.getPrincipal();
+            // we intercept principal and read tokens: idToken & accessToken
+            if(context.getTokenType().getValue().equals("id_token")) {
+                context.getClaims().claim("token_type", "id token");
+            }
+            if(context.getTokenType().getValue().equals("access_token")) {
+                context.getClaims().claim("token_type", "access token");
+                // TODO: improve to get also role + authorities
+                Set<String> roles = principalUser.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toSet());
+                context.getClaims()
+                        .claim("roles", roles)
+                        .claim("username", principalUser.getName());
+            }
+        };
     }
 
     /**

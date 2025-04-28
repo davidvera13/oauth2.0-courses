@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/step 02 - authorization server mysql users and clients persistence.iml" filepath="$PROJECT_DIR$/.idea/step 02 - authorization server mysql users and clients persistence.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/step 03 - authorization server jwt customization.iml" filepath="$PROJECT_DIR$/.idea/step 03 - authorization server jwt customization.iml" />
     </modules>
   </component>
 </project>

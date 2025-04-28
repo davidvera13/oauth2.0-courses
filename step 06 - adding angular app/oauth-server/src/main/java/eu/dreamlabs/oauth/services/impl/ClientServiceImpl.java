@@ -1,9 +1,9 @@
 package eu.dreamlabs.oauth.services.impl;
 
-import eu.dreamlabs.oauth.entities.clients.ClientEntity;
 import eu.dreamlabs.oauth.mappers.ClientMapper;
-import eu.dreamlabs.oauth.repositories.ClientRepository;
 import eu.dreamlabs.oauth.services.ClientService;
+import eu.dreamlabs.oauth.entities.clients.ClientEntity;
+import eu.dreamlabs.oauth.repositories.ClientRepository;
 import eu.dreamlabs.oauth.shared.dto.MessageDto;
 import eu.dreamlabs.oauth.shared.dto.clients.ClientDto;
 import lombok.RequiredArgsConstructor;

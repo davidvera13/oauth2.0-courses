@@ -61,3 +61,8 @@ logging:
   level:
     org.springframework.security: TRACE
     org.springframework.security.oauth2: TRACE
+
+# can be modified
+auth:
+  logout:
+    url: "http://localhost:4200/logout"

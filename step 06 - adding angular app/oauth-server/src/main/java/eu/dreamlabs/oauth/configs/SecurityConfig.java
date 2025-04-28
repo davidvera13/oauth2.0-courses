@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final GoogleUserRepository googleUserRepository;
+    private final Environment environment;
 
     /**
      * 1. A Spring Security filter chain for the Protocol Endpoints.
@@ -76,7 +78,7 @@ public class SecurityConfig {
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
-                        authorizationServer.oidc(Customizer.withDefaults()))	// Enable OpenID Connect 1.0
+                        authorizationServer.oidc(Customizer.withDefaults())) // Enable OpenID Connect 1.0
                 .authorizeHttpRequests((authorize) ->
                         authorize.anyRequest().authenticated())
                 // Redirect to the login page when not authenticated from the authorization endpoint
@@ -85,8 +87,8 @@ public class SecurityConfig {
                                 new LoginUrlAuthenticationEntryPoint("/login"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
                 // Accept access tokens for User Info and/or Client Registration
-                .oauth2ResourceServer((resourceServer) ->
-                        resourceServer.jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer((resourceServer) -> resourceServer
+                        .jwt(Customizer.withDefaults()))
                 .build();
     }
 
@@ -112,14 +114,17 @@ public class SecurityConfig {
                         .requestMatchers("/assets/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated())
                 // Form login handles the redirect to the login page from the authorization server filter chain
-                .csrf(csrfConfigurer ->
-                        csrfConfigurer.ignoringRequestMatchers("/auth", "/clients"))
+                .csrf(csrfConfigurer -> csrfConfigurer
+                        .ignoringRequestMatchers("/auth", "/clients")
+                        .disable())
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login"))
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/login")
                         .successHandler(authenticationSuccessHandler()))
                 //.formLogin(Customizer.withDefaults())
+                .logout(logout ->
+                        logout.logoutSuccessUrl(environment.getProperty("auth.logout.url")))
                 .with(
                         federatedIdentityConfigurer,
                         configurer -> configurer

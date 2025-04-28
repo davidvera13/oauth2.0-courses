@@ -19,17 +19,14 @@ export class OauthService {
   /**
    * we must check code challenge is validated by the verifier
    * @param code
+   * @param codeVerifier
    */
-  /**
-   * we must check code challenge is validated by the verifier
-   * @param code
-   */
-  getToken(code: string): Observable<AuthTokenResponse> {
+  getToken(code: string, codeVerifier: string): Observable<AuthTokenResponse> {
     let body = new URLSearchParams();
     body.set('grant_type', environment.grantType);
     body.set('client_id', environment.clientId);
     body.set('redirect_uri', environment.redirectUri);
-    body.set('code_verifier', environment.codeVerifier);
+    body.set('code_verifier', codeVerifier);
     body.set('code', code);
 
     const auth = 'Basic ' + btoa('client:secret');

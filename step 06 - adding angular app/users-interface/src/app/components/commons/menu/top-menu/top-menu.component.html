@@ -24,18 +24,33 @@
           </a>
         </li>
         <li class="nav-item">
-          <a
-            class="nav-link"
-            href="#">
-            Link
-          </a>
+          @if (isLogged) {
+            <a
+              class="nav-link"
+              routerLink="/users">
+              Users
+            </a>
+          }
         </li>
         <li class="nav-item">
-          <a
-            class="nav-link disabled">
-            Disabled
-          </a>
+          @if (isAdmin) {
+            <a
+              class="nav-link"
+              routerLink="/admins">
+              Admin
+            </a>
+          }
         </li>
+        <li class="nav-item">
+          @if (isLogged) {
+            <a
+              class="nav-link"
+              routerLink="/any">
+              Any
+            </a>
+          }
+        </li>
+
       </ul>
       <form class="d-flex" role="search">
         <button
@@ -45,7 +60,8 @@
           Login</button>
         <button
           class="btn btn-outline-danger"
-          type="button">
+          type="button"
+          (click)="onLogout()">
           Logout
         </button>
       </form>

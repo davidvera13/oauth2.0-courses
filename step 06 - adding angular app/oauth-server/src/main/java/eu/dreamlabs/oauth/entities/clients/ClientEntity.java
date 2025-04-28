@@ -3,8 +3,13 @@ package eu.dreamlabs.oauth.entities.clients;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+//import org.springframework.security.oauth2.core.AuthorizationGrantType;
+//import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+//import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+//import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 
 import java.time.Instant;
+//import java.util.Date;
 import java.util.Set;
 
 @Entity

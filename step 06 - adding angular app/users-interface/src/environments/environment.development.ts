@@ -19,8 +19,13 @@ export const environment = {
   responseType: 'code',
   responseMode: 'form_post',
   codeChallengeMethod: 'S256',
-  codeVerifier: 'ulqd9qLHh3cky4ZS2ywoGkWVJDxqm5HVqvMg4A6ZyMk',
-  codeChallenge: 'PzrD4RmWTRntY4i0NMgWu3zdKOVVyOlkmyWMTcECHaM',
+  //codeVerifier: 'ZNOYb0ZS0D2slcWpqrhw5Poc5GdHhEkl0ixYLSjnW8G',
+  //codeChallenge: 'wgpyZrXzyFm8VFvz8BinKviNsoNGHy5NI29ZPGN6Asw',
   // state and nonce are ignored
   tokenUri: 'http://localhost:9000/oauth2/token',
+  resources: {
+    resourcesUrl: 'http://localhost:8787/resources'
+  },
+  logoutUri: 'http://localhost:9000/logout',
+  secretPKCE: '9PgT0RyD6ejy4XM2EUgpnGvFYQg6yS'
 };

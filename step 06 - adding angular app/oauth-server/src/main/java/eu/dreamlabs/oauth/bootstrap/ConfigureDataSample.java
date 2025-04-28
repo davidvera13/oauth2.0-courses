@@ -3,6 +3,7 @@ package eu.dreamlabs.oauth.bootstrap;
 import eu.dreamlabs.oauth.entities.clients.ClientEntity;
 import eu.dreamlabs.oauth.entities.users.RoleEntity;
 import eu.dreamlabs.oauth.entities.users.UserEntity;
+import eu.dreamlabs.oauth.repositories.AuthorityRepository;
 import eu.dreamlabs.oauth.repositories.ClientRepository;
 import eu.dreamlabs.oauth.repositories.RoleRepository;
 import eu.dreamlabs.oauth.repositories.UserRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Configuration
@@ -30,13 +32,14 @@ public class ConfigureDataSample implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) throws Exception {
-        if(clientRepository.count() > 0) {
-            ClientEntity oidc = clientRepository.findByClientId("oidc-client")
-                    .orElseThrow(() -> new RuntimeException("No client found"));
-            clientRepository.delete(oidc);
+        Optional<ClientEntity> client = clientRepository.findByClientId("oidc-client");
+        if(client.isEmpty()) {
+            //ClientEntity oidc = clientRepository.findByClientId("oidc-client")
+            //        .orElseThrow(() -> new RuntimeException("No client found"));
+            //clientRepository.delete(oidc);
+            ClientEntity clientEntity = setClientEntity();
+            clientRepository.save(clientEntity);
         }
-        ClientEntity clientEntity = setClientEntity();
-        clientRepository.save(clientEntity);
 
         if(roleRepository.count() == 0) {
             RoleEntity adminRole = modelMapper.map(

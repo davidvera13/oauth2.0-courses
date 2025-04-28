@@ -15,6 +15,7 @@ public class ClientEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String clientId;
 
     private Instant clientIdIssuedAt;

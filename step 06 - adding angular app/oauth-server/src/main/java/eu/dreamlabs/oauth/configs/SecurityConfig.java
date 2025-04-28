@@ -38,11 +38,15 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -69,6 +73,7 @@ public class SecurityConfig {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 OAuth2AuthorizationServerConfigurer.authorizationServer();
         return http
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
                         authorizationServer.oidc(Customizer.withDefaults()))	// Enable OpenID Connect 1.0
@@ -99,6 +104,7 @@ public class SecurityConfig {
         FederatedIdentityConfigurer federatedIdentityConfigurer = new FederatedIdentityConfigurer()
                 .oauth2UserHandler(new UserRepositoryOAuth2UserHandler(googleUserRepository));
         return http
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
@@ -229,5 +235,28 @@ public class SecurityConfig {
     @Bean
     public OAuth2AuthorizationConsentService authorizationConsentService() {
         return new InMemoryOAuth2AuthorizationConsentService();
+    }
+
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration corsConfiguration = new CorsConfiguration();
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        corsConfiguration.setAllowedMethods(List.of(
+                HttpMethod.GET.name(),
+                HttpMethod.HEAD.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.PATCH.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name(),
+                HttpMethod.TRACE.name()));
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setExposedHeaders(List.of("*"));
+        corsConfiguration.addAllowedOriginPattern("*");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.setAllowCredentials(true);
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 }

@@ -73,7 +73,9 @@ public class ClientServiceImpl implements ClientService {
                 .redirectUris(ru -> ru.addAll(client.getRedirectUris()))
                 .scopes(sc -> sc.addAll(client.getScopes()))
                 .clientSettings(ClientSettings
-                        .builder().requireProofKey(client.isRequireProofKey()).build())
+                        .builder()
+                        .requireProofKey(client.isRequireProofKey())
+                        .build())
                 .build();
     }
 }

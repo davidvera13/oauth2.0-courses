@@ -5,6 +5,10 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import eu.dreamlabs.oauth.federation.FederatedIdentityAuthenticationSuccessHandler;
+import eu.dreamlabs.oauth.federation.FederatedIdentityConfigurer;
+import eu.dreamlabs.oauth.federation.UserRepositoryOAuth2UserHandler;
+import eu.dreamlabs.oauth.repositories.GoogleUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -17,14 +21,22 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import java.security.KeyPair;
@@ -40,6 +52,7 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final GoogleUserRepository googleUserRepository;
 
     /**
      * 1. A Spring Security filter chain for the Protocol Endpoints.
@@ -83,15 +96,29 @@ public class SecurityConfig {
     public SecurityFilterChain defaultWebSecurityFilterChain(HttpSecurity http)
             throws Exception {
         log.info("# defaultWebSecurityFilterChain() bean called");
+        FederatedIdentityConfigurer federatedIdentityConfigurer = new FederatedIdentityConfigurer()
+                .oauth2UserHandler(new UserRepositoryOAuth2UserHandler(googleUserRepository));
         return http
                 .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clients").permitAll()
+                        .requestMatchers("/assets/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated())
                 // Form login handles the redirect to the login page from the authorization server filter chain
                 .csrf(csrfConfigurer ->
                         csrfConfigurer.ignoringRequestMatchers("/auth", "/clients"))
-                .formLogin(Customizer.withDefaults())
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login"))
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .loginPage("/login")
+                        .successHandler(authenticationSuccessHandler()))
+                //.formLogin(Customizer.withDefaults())
+                .with(
+                        federatedIdentityConfigurer,
+                        configurer -> configurer
+                                .oauth2UserHandler(new UserRepositoryOAuth2UserHandler(googleUserRepository))
+                                .loginPageUrl("/login"))
                 .build();
     }
 
@@ -178,5 +205,29 @@ public class SecurityConfig {
         return AuthorizationServerSettings.builder()
                 .issuer("http://localhost:9000")
                 .build();
+    }
+
+    private AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new FederatedIdentityAuthenticationSuccessHandler();
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
+    @Bean
+    public OAuth2AuthorizationService authorizationService() {
+        return new InMemoryOAuth2AuthorizationService();
+    }
+
+    @Bean
+    public OAuth2AuthorizationConsentService authorizationConsentService() {
+        return new InMemoryOAuth2AuthorizationConsentService();
     }
 }

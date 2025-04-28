@@ -22,4 +22,10 @@ public class ResourcesController {
     public ResponseEntity<MessageResponse> adminMessage(Authentication auth) {
         return ResponseEntity.ok(new MessageResponse("Hello M. " + auth.getName()));
     }
+
+    @GetMapping("/any")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER', 'OIDC_USER')")
+    public ResponseEntity<MessageResponse> allMessage(Authentication auth) {
+        return ResponseEntity.ok(new MessageResponse("Hello you whoever is logged in " + auth.getName()));
+    }
 }

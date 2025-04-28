@@ -1,0 +1,15 @@
+server:
+  port: 8787
+
+spring:
+  application:
+    name: resources-server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+logging:
+  level:
+    org.springframework.security.oauth2: trace
+    org.springframework.security: trace

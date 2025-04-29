@@ -1,7 +1,6 @@
 package eu.dreamlabs.oauth.configs;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration.AccessLevel;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.convention.NamingConventions;
 import org.modelmapper.module.jsr310.Jsr310Module;
@@ -35,7 +34,7 @@ public class AppBeanConfig {
                 .setPreferNestedProperties(false)
                 .setFieldMatchingEnabled(true)
                 .setSourceNamingConvention(NamingConventions.JAVABEANS_MUTATOR)
-                .setFieldAccessLevel(AccessLevel.PRIVATE);
+                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
         modelMapper.registerModule(new Jsr310Module(config));
 
         return modelMapper;

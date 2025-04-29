@@ -3,7 +3,6 @@ package eu.dreamlabs.oauth.bootstrap;
 import eu.dreamlabs.oauth.entities.clients.ClientEntity;
 import eu.dreamlabs.oauth.entities.users.RoleEntity;
 import eu.dreamlabs.oauth.entities.users.UserEntity;
-import eu.dreamlabs.oauth.repositories.AuthorityRepository;
 import eu.dreamlabs.oauth.repositories.ClientRepository;
 import eu.dreamlabs.oauth.repositories.RoleRepository;
 import eu.dreamlabs.oauth.repositories.UserRepository;

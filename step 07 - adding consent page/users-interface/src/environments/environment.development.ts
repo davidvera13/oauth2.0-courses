@@ -15,7 +15,7 @@ export const environment = {
   authorizeUri: 'http://localhost:9000/oauth2/authorize?',
   clientId: 'client',
   redirectUri: 'http://localhost:4200/authorized',
-  scope: 'openid',
+  scope: 'openid profile email',
   responseType: 'code',
   responseMode: 'form_post',
   codeChallengeMethod: 'S256',

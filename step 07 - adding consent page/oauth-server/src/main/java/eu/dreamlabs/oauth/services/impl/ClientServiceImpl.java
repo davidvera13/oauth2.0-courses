@@ -7,6 +7,7 @@ import eu.dreamlabs.oauth.repositories.ClientRepository;
 import eu.dreamlabs.oauth.shared.dto.MessageDto;
 import eu.dreamlabs.oauth.shared.dto.clients.ClientDto;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -23,6 +24,7 @@ import java.util.Set;
 public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Override
     public MessageDto createClient(ClientDto request) {
@@ -54,7 +56,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
 
-    private RegisteredClient toRegisteredClient(ClientEntity client){
+    @Override
+    public RegisteredClient toRegisteredClient(ClientEntity client){
         Set<AuthorizationGrantType> authorizationGrantTypes = new HashSet<>();
         Set<ClientAuthenticationMethod> clientAuthenticationMethods = new HashSet<>();
 
@@ -75,6 +78,7 @@ public class ClientServiceImpl implements ClientService {
                 .clientSettings(ClientSettings
                         .builder()
                         .requireProofKey(client.isRequireProofKey())
+                        .requireAuthorizationConsent(Boolean.TRUE)
                         .build())
                 .build();
     }

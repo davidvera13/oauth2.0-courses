@@ -9,6 +9,9 @@ import eu.dreamlabs.oauth.federation.FederatedIdentityAuthenticationSuccessHandl
 import eu.dreamlabs.oauth.federation.FederatedIdentityConfigurer;
 import eu.dreamlabs.oauth.federation.UserRepositoryOAuth2UserHandler;
 import eu.dreamlabs.oauth.repositories.GoogleUserRepository;
+import eu.dreamlabs.oauth.repositories.UserRepository;
+import eu.dreamlabs.oauth.services.ClientService;
+import eu.dreamlabs.oauth.services.impl.AuthorizationConsentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -24,16 +27,28 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -45,6 +60,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
@@ -57,7 +73,9 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private static final String CONSENT_PAGE = "/oauth2/consent";
     private final GoogleUserRepository googleUserRepository;
+    private final AuthorizationConsentService authorizationConsentService;
     private final Environment environment;
 
     /**
@@ -74,13 +92,19 @@ public class SecurityConfig {
         log.info("# authorizationServerSecurityFilterChain() bean called");
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 OAuth2AuthorizationServerConfigurer.authorizationServer();
+
         return http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
-                        authorizationServer.oidc(Customizer.withDefaults())) // Enable OpenID Connect 1.0
+                        authorizationServer
+                                .authorizationEndpoint(authorizationEndpoint ->
+                                        authorizationEndpoint.consentPage(CONSENT_PAGE))
+                                .oidc(Customizer.withDefaults())	// Enable OpenID Connect 1.0
+                )
                 .authorizeHttpRequests((authorize) ->
-                        authorize.anyRequest().authenticated())
+                        authorize.anyRequest().authenticated()
+                )
                 // Redirect to the login page when not authenticated from the authorization endpoint
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
@@ -132,6 +156,7 @@ public class SecurityConfig {
                                 .loginPageUrl("/login"))
                 .build();
     }
+
 
     /**
      * We want to define JWT with custom claims
@@ -235,11 +260,6 @@ public class SecurityConfig {
     @Bean
     public OAuth2AuthorizationService authorizationService() {
         return new InMemoryOAuth2AuthorizationService();
-    }
-
-    @Bean
-    public OAuth2AuthorizationConsentService authorizationConsentService() {
-        return new InMemoryOAuth2AuthorizationConsentService();
     }
 
     public CorsConfigurationSource corsConfigurationSource() {

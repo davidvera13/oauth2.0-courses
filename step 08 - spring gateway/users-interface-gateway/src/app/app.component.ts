@@ -18,18 +18,7 @@ export class AppComponent {
   }
 
   onLogin(): void {
-    // http://localhost:9000/oauth2/authorize?
-    //    client_id=oidc-client&
-    //    redirect_uri=https://oauthdebugger.com/debug&
-    //    scope=openid&
-    //    response_type=code&
-    //    response_mode=form_post&
-    //    code_challenge_method=S256&
-    //    code_challenge=ZMqsTsK3mcijkFnD2...SPNQ&
-    //    state=2umhguvv7eq&
-    //    nonce=51zgiwz11f5
-    //window.location.href = 'http://localhost:9000/';
-    window.location.href = 'http://127.0.0.1:8765/oauth2/authorization/gateway';
+    window.location.href = '/oauth2/authorization/gateway';
 
   }
 

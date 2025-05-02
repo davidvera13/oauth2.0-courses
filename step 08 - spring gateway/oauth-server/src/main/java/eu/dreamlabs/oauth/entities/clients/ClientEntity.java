@@ -60,6 +60,13 @@ public class ClientEntity {
     )
     private Set<String> redirectUris;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "post_logout_redirect_uris",
+            joinColumns = @JoinColumn(name = "client_id")
+    )
+    private Set<String> postLogoutRedirectUris;
+
     // @Column(length = 1000)
     // private String scopes;
     @ElementCollection(fetch = FetchType.EAGER)

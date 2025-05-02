@@ -26,6 +26,7 @@ public class ClientMapper {
                 .clientAuthenticationMethods(authenticationMethods)
                 .authorizationGrantTypes(authorizationGrantTypes)
                 .redirectUris(client.getRedirectUris())
+                .postLogoutRedirectUris(client.getPostLogoutRedirectUris())
                 .scopes(client.getScopes())
                 .requireProofKey(client.getRequireProofKey() == null ? Boolean.FALSE : Boolean.TRUE)
                 .build();
@@ -41,12 +42,21 @@ public class ClientMapper {
             authorizationGrantTypes.add(authorizationGrantType.getValue());
         });
 
+        return setClientEntity(client, authenticationMethods, authorizationGrantTypes);
+
+    }
+
+    private static ClientEntity setClientEntity(
+            ClientDto client,
+            Set<String> authenticationMethods,
+            Set<String> authorizationGrantTypes) {
         ClientEntity clientEntity = new ClientEntity();
         clientEntity.setClientId(client.getClientId());
         //clientEntity.setClientSecret(client.getClientSecret());
         clientEntity.setClientAuthenticationMethods(authenticationMethods);
         clientEntity.setAuthorizationGrantTypes(authorizationGrantTypes);
         clientEntity.setRedirectUris(client.getRedirectUris());
+        clientEntity.setPostLogoutRedirectUris(client.getPostLogoutRedirectUris());
         clientEntity.setRequireProofKey(client.isRequireProofKey());
         clientEntity.setScopes(client.getScopes());
         return clientEntity;

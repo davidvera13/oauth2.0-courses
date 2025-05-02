@@ -15,6 +15,7 @@ public class ClientCreateRequest {
     // Cannot construct instance of `org.springframework.security.oauth2.core.AuthorizationGrantType`
     private Set<String> authorizationGrantTypes;
     private Set<String> redirectUris;
+    private Set<String> postLogoutRedirectUris;
     private Set<String> scopes;
     private Boolean requireProofKey;
 }

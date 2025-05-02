@@ -19,6 +19,7 @@ public class ClientDto {
     private Set<ClientAuthenticationMethod> clientAuthenticationMethods;
     private Set<AuthorizationGrantType> authorizationGrantTypes;
     private Set<String> redirectUris;
+    private Set<String> postLogoutRedirectUris;
     private Set<String> scopes;
     private boolean requireProofKey;
     // private String postLogoutRedirectUris;

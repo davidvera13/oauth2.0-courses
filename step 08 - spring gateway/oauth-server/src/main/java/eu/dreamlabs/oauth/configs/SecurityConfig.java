@@ -148,7 +148,9 @@ public class SecurityConfig {
                         .successHandler(authenticationSuccessHandler()))
                 //.formLogin(Customizer.withDefaults())
                 .logout(logout ->
-                        logout.logoutSuccessUrl(environment.getProperty("auth.logout.url")))
+                        //logout.logoutSuccessUrl(environment.getProperty("auth.logout.url")))
+                        logout.logoutSuccessHandler(new CustomLogoutSuccessHandler())
+                )
                 .with(
                         federatedIdentityConfigurer,
                         configurer -> configurer

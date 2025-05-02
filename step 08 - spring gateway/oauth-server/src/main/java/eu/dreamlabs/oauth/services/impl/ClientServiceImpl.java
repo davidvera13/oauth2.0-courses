@@ -24,7 +24,6 @@ import java.util.Set;
 public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ModelMapper modelMapper;
 
     @Override
     public MessageDto createClient(ClientDto request) {
@@ -74,6 +73,7 @@ public class ClientServiceImpl implements ClientService {
                 .clientAuthenticationMethods(am -> am.addAll(clientAuthenticationMethods))
                 .authorizationGrantTypes(agt -> agt.addAll(authorizationGrantTypes))
                 .redirectUris(ru -> ru.addAll(client.getRedirectUris()))
+                .postLogoutRedirectUris(pl -> pl.addAll(client.getPostLogoutRedirectUris()))
                 .scopes(sc -> sc.addAll(client.getScopes()))
                 .clientSettings(ClientSettings
                         .builder()

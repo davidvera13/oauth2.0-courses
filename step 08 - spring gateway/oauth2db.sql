@@ -140,6 +140,7 @@ CREATE TABLE `clients` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `client_id` varchar(255) DEFAULT NULL,
   `client_secret` varchar(255) DEFAULT NULL,
+  `post_logout_redirect_uri` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -150,9 +151,9 @@ CREATE TABLE `clients` (
 
 LOCK TABLES `clients` WRITE;
 /*!40000 ALTER TABLE `clients` DISABLE KEYS */;
-INSERT INTO `clients` (`require_proof_key`, `client_id_issued_at`, `client_secret_expires_at`, `id`, `client_id`, `client_secret`) VALUES (_binary '',NULL,NULL,2,'client','$2a$10$Rs3bOXZQXiSrrqRW28l7Xeq0m/Xng6vJgPLvwXvkL8wOJqCGLukGq');
-INSERT INTO `clients` (`require_proof_key`, `client_id_issued_at`, `client_secret_expires_at`, `id`, `client_id`, `client_secret`) VALUES (_binary '',NULL,NULL,5,'oidc-client','$2a$10$3Glyd7O6g6ZIVbcvD7T3mODlVPh0SOENPWQjmKakLG32b1HuJAFtK');
-INSERT INTO `clients` (`require_proof_key`, `client_id_issued_at`, `client_secret_expires_at`, `id`, `client_id`, `client_secret`) VALUES (_binary '\0',NULL,NULL,13,'gateway','$2a$10$S.xSApaRWFX6yKZkUne93uFrH8VGnv1vx50RF1bGiqXLUCLmxxj7m');
+INSERT INTO `clients` (`require_proof_key`, `client_id_issued_at`, `client_secret_expires_at`, `id`, `client_id`, `client_secret`, `post_logout_redirect_uri`) VALUES (_binary '',NULL,NULL,2,'client','$2a$10$Rs3bOXZQXiSrrqRW28l7Xeq0m/Xng6vJgPLvwXvkL8wOJqCGLukGq',NULL);
+INSERT INTO `clients` (`require_proof_key`, `client_id_issued_at`, `client_secret_expires_at`, `id`, `client_id`, `client_secret`, `post_logout_redirect_uri`) VALUES (_binary '',NULL,NULL,5,'oidc-client','$2a$10$3Glyd7O6g6ZIVbcvD7T3mODlVPh0SOENPWQjmKakLG32b1HuJAFtK',NULL);
+INSERT INTO `clients` (`require_proof_key`, `client_id_issued_at`, `client_secret_expires_at`, `id`, `client_id`, `client_secret`, `post_logout_redirect_uri`) VALUES (_binary '\0',NULL,NULL,13,'gateway','$2a$10$S.xSApaRWFX6yKZkUne93uFrH8VGnv1vx50RF1bGiqXLUCLmxxj7m',NULL);
 /*!40000 ALTER TABLE `clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -182,6 +183,31 @@ LOCK TABLES `google_users` WRITE;
 /*!40000 ALTER TABLE `google_users` DISABLE KEYS */;
 INSERT INTO `google_users` (`id`, `email`, `family_name`, `given_name`, `name`, `picture_url`) VALUES (2,'davidvera.javaspring@gmail.com','Vera','David','David Vera','https://lh3.googleusercontent.com/a/ACg8ocJA0vqyawgVCOrRQHCeoggrO8JYpusWzZPjSIIlfgTaNS8ung=s96-c');
 /*!40000 ALTER TABLE `google_users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `post_logout_redirect_uris`
+--
+
+DROP TABLE IF EXISTS `post_logout_redirect_uris`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `post_logout_redirect_uris` (
+  `client_id` bigint NOT NULL,
+  `post_logout_redirect_uris` varchar(255) DEFAULT NULL,
+  KEY `FKnc32jk08675ssjvgkk7932bfp` (`client_id`),
+  CONSTRAINT `FKnc32jk08675ssjvgkk7932bfp` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `post_logout_redirect_uris`
+--
+
+LOCK TABLES `post_logout_redirect_uris` WRITE;
+/*!40000 ALTER TABLE `post_logout_redirect_uris` DISABLE KEYS */;
+INSERT INTO `post_logout_redirect_uris` (`client_id`, `post_logout_redirect_uris`) VALUES (13,'http://127.0.0.1:8765/logged-out');
+/*!40000 ALTER TABLE `post_logout_redirect_uris` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -362,4 +388,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-02  8:27:39
+-- Dump completed on 2025-05-02 16:13:55

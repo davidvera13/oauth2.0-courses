@@ -77,7 +77,7 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "port": 4200,
+            "port": 5200,
             "host": "localhost"
           }
         },

@@ -14,17 +14,15 @@ export const environment = {
   grantType: 'authorization_code',
   authorizeUri: 'http://localhost:9000/oauth2/authorize?',
   clientId: 'client',
-  redirectUri: 'http://localhost:4200/authorized',
+  redirectUri: 'http://localhost:5200/authorized',
   scope: 'openid profile email',
   responseType: 'code',
   responseMode: 'form_post',
   codeChallengeMethod: 'S256',
-  //codeVerifier: 'ZNOYb0ZS0D2slcWpqrhw5Poc5GdHhEkl0ixYLSjnW8G',
-  //codeChallenge: 'wgpyZrXzyFm8VFvz8BinKviNsoNGHy5NI29ZPGN6Asw',
   // state and nonce are ignored
   tokenUri: 'http://localhost:9000/oauth2/token',
   resources: {
-    resourcesUrl: 'http://localhost:8787/resources'
+    resourcesUrl: 'http://localhost:8787/api/v1/resources'
   },
   logoutUri: 'http://localhost:9000/logout',
   secretPKCE: '9PgT0RyD6ejy4XM2EUgpnGvFYQg6yS'

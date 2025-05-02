@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'users-interface' title`, () => {
+  it(`should have the 'ng-oauth-app-gateway' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('users-interface');
+    expect(app.title).toEqual('ng-oauth-app-gateway');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, users-interface');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, ng-oauth-app-gateway');
   });
 });

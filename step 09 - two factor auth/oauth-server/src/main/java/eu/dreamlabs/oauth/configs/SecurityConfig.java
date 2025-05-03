@@ -12,6 +12,8 @@ import eu.dreamlabs.oauth.repositories.GoogleUserRepository;
 import eu.dreamlabs.oauth.repositories.UserRepository;
 import eu.dreamlabs.oauth.services.ClientService;
 import eu.dreamlabs.oauth.services.impl.AuthorizationConsentService;
+import eu.dreamlabs.oauth.twofactorauth.TwoFactorAuthService;
+import eu.dreamlabs.oauth.twofactorauth.TwoFactorHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +54,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -124,7 +127,9 @@ public class SecurityConfig {
      */
     @Bean
     @Order(2)
-    public SecurityFilterChain defaultWebSecurityFilterChain(HttpSecurity http)
+    public SecurityFilterChain defaultWebSecurityFilterChain(
+            HttpSecurity http,
+            TwoFactorAuthService twoFactorAuthService)
             throws Exception {
         log.info("# defaultWebSecurityFilterChain() bean called");
         FederatedIdentityConfigurer federatedIdentityConfigurer = new FederatedIdentityConfigurer()
@@ -133,6 +138,7 @@ public class SecurityConfig {
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/2fa").hasAuthority("ROLE_2FA")
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clients").permitAll()
                         .requestMatchers("/assets/**", "/webjars/**").permitAll()
@@ -142,7 +148,9 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/auth", "/clients")
                         .disable())
                 .formLogin(formLogin -> formLogin
-                        .loginPage("/login"))
+                        .loginPage("/login")
+                        .successHandler(new TwoFactorHandler(twoFactorAuthService))
+                        .failureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error")))
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/login")
                         .successHandler(authenticationSuccessHandler()))

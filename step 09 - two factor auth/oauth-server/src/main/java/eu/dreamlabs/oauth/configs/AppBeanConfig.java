@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -38,5 +40,10 @@ public class AppBeanConfig {
         modelMapper.registerModule(new Jsr310Module(config));
 
         return modelMapper;
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler(){
+        return new SavedRequestAwareAuthenticationSuccessHandler();
     }
 }

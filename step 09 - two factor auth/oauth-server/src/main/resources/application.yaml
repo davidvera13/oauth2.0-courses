@@ -1,0 +1,68 @@
+server:
+  port: 9000
+spring:
+  application:
+    name: oauth-server
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: "jdbc:mysql://localhost:3306/oauth2?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true"
+    username: "root"
+    password: "root"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # we will allow google authentication
+  security:
+    oauth2:
+      client:
+        registration:
+          google-idp:
+            provider: google
+            client-id: ${GOOGLE_CLIENT_ID:google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret}
+            scope:
+              - openid
+              - https://www.googleapis.com/auth/userinfo.profile
+              - https://www.googleapis.com/auth/userinfo.email
+            client-name: Sign in with Google
+          #github-idp:
+          #  provider: github
+          #  client-id: ${GITHUB_CLIENT_ID:github-client-id}
+          #  client-secret: ${GITHUB_CLIENT_SECRET:github-client-secret}
+          #  scope: user:email, read:user
+          #  client-name: Sign in with GitHub
+          #facebook-idp:
+          #  provider: github
+          #  client-id: ${FACEBOOK_CLIENT_ID:github-client-id}
+          #  client-secret: ${FACEBOOK_CLIENT_SECRET:github-client-secret}
+          #  scope: user:email, read:user
+          #  client-name: Sign in with Facebook
+        provider:
+          google:
+            user-name-attribute: email
+          #github:
+          #  user-name-attribute: login
+
+#http://localhost:9000/login/oauth2/code/messaging-client-oidc
+#http://localhost:9000/authorized
+#http://localhost:9000/index
+#http://localhost:9000/login/oauth2/code/google-idp
+#http://localhost:9000/oauth2/authorization/google-idp
+#https://oauthdebugger.com/debug
+#http://localhost:4200/authorized
+
+
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
+
+# can be modified
+auth:
+  logout:
+    url: "http://localhost:4200/logout"

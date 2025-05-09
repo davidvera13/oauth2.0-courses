@@ -1,1 +1,3 @@
 ﻿**/.idea
+*.zip
+**/keycloak-26.2.3

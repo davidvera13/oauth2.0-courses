@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/photos")
+@RequestMapping("/api/photos")
 public class PhotosController {
 
     @GetMapping
@@ -31,7 +31,7 @@ public class PhotosController {
                 .photoDescription("Description 2")
                 .photoUrl("url 2")
                 .build();
-        
+
         return Arrays.asList(photo1, photo2);
     }
 

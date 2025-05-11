@@ -6,6 +6,13 @@ spring:
     name: gateway
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: '*'
+            allowed-methods: '*'
+            allowed-headers: '*'
+        add-to-simple-url-handler-mapping: true
       routes:
         - id: users-status
           uri: lb://resource-server

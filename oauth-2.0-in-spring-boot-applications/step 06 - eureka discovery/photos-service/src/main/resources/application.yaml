@@ -1,0 +1,14 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: photos-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # URI that can either be an OpenID Connect discovery endpoint or an OAuth 2.0
+          #	Authorization Server Metadata endpoint defined by RFC 8414.
+          issuer-uri: http://localhost:8080/realms/web-apps
+          # JSON Web Key URI to use to verify the JWT token: public key endpoint
+          jwk-set-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/certs

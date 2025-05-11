@@ -1,0 +1,45 @@
+server:
+  port: 8765
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: users-status
+          uri: lb://resource-server
+          predicates:
+            - Path=/api/users/status
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: usersRoutes
+          uri: lb://resource-server
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: tokensRoutes
+          uri: lb://resource-server
+          predicates:
+            - Path=/api/tokens/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: albums-service
+          uri: lb://albums-service
+          predicates:
+            - Path=/api/albums/**
+        - id: photos-service
+          uri: lb://photos-service
+          predicates:
+            - Path=/api/photos/**
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${instanceId:${random.value}}
+    preferIpAddress: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 20

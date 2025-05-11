@@ -26,6 +26,16 @@ public class UserController {
         return "Working on port " + env.getProperty("server.port");
     }
 
+    @GetMapping("/developer")
+    public String getUserWithRoleDeveloper(@AuthenticationPrincipal Jwt jwt) {
+        Map<String, Object> claims = jwt.getClaims();
+        System.out.println("----------------------------------------");
+        claims.forEach((claimName, claimValue) -> {
+            System.out.println(claimName + ": " + claimValue);
+        });
+        return "Working on port " + env.getProperty("server.port");
+    }
+
     @GetMapping("/status")
     public String status() {
         return "Working on port " + env.getProperty("server.port");

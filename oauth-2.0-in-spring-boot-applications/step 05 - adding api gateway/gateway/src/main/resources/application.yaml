@@ -1,0 +1,29 @@
+server:
+  port: 8765
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: users-status
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/users/status
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: usersRoutes
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: tokensRoutes
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/tokens/**
+          filters:
+            - RemoveRequestHeader=Cookie
+

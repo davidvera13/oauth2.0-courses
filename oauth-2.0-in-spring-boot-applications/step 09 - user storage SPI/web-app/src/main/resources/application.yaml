@@ -1,0 +1,25 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: webapp
+  # we are using key cloack
+  security:
+    oauth2:
+      client:
+        provider:
+          webapps:
+            authorization-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/auth
+            jwk-set-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/certs
+            token-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/token
+            user-info-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+        registration:
+          webapps:
+            authorization-grant-type: authorization_code
+            client-id: webapp-code-flow-client
+            client-secret: OFgWX2OvqQ0NUe4XSLtQvJiVtGpgk9SN
+            redirect-uri: http://localhost:8090/login/oauth2/code/webapps
+            scope: openid, profile, roles
+
+

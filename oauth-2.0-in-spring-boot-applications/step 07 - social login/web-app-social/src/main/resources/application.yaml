@@ -1,0 +1,41 @@
+server:
+  port: 8091
+spring:
+  application:
+    name: web-app-social
+  # we are using key cloack
+  security:
+    oauth2:
+      client:
+        provider:
+          webapps:
+            authorization-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/auth
+            jwk-set-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/certs
+            token-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/token
+            user-info-uri: http://localhost:8080/realms/web-apps/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+          okta:
+            issuer-uri: https://dev-hrlqba56cc30prsf.us.auth0.com/
+        registration:
+          webapps:
+            authorization-grant-type: authorization_code
+            client-id: webappsocial-code-flow-client
+            client-secret: rqRtJgnPYtDR8AEgKmcG5vApbDvkoodm
+            redirect-uri: http://localhost:8091/login/oauth2/code/webapps
+            scope: openid, profile, roles
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret}
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID:github-client-id}
+            client-secret: ${FACEBOOK_CLIENT_SECRET:github-client-secret}
+#          github:
+#            client-id: ${GITHUB_CLIENT_ID:github-client-id}
+#            client-secret: ${GITHUB_CLIENT_SECRET:github-client-secret}
+          okta:
+            client-id: ${OKTA_CLIENT_ID:okta-client-id}
+            client-secret: ${OKTA_CLIENT_SECRET:okta-client-id}
+            scope:
+              - openid
+              - profile
+            redirect-uri: http://localhost:8091/login/oauth2/code/okta

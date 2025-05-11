@@ -34,3 +34,7 @@ spring:
           uri: http://localhost:8083
           predicates:
             - Path=/api/photos
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka

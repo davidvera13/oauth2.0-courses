@@ -31,7 +31,7 @@ public class UserController {
         claims.forEach((claimName, claimValue) -> {
             System.out.println(claimName + ": " + claimValue);
         });
-        return "Working on port " + env.getProperty("server.port");
+        return "Working on port " + env.getProperty("local.server.port");
     }
 
     @GetMapping("/developer")
@@ -41,7 +41,7 @@ public class UserController {
         claims.forEach((claimName, claimValue) -> {
             System.out.println(claimName + ": " + claimValue);
         });
-        return "Working on port " + env.getProperty("server.port");
+        return "Working on port " + env.getProperty("local.server.port");
     }
 
     @Secured("ROLE_DEVELOPER")
@@ -118,6 +118,6 @@ public class UserController {
 
     @GetMapping("/status")
     public String status() {
-        return "Working on port " + env.getProperty("server.port");
+        return env.getProperty("spring.application.name") + "Working on port " + env.getProperty("local.server.port");
     }
 }

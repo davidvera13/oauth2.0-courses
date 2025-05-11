@@ -8,33 +8,38 @@ spring:
     gateway:
       routes:
         - id: users-status
-          uri: http://localhost:8081
+          uri: lb://resource-server
           predicates:
             - Path=/api/users/status
             - Method=GET
           filters:
             - RemoveRequestHeader=Cookie
         - id: usersRoutes
-          uri: http://localhost:8081
+          uri: lb://resource-server
           predicates:
             - Path=/api/users/**
           filters:
             - RemoveRequestHeader=Cookie
         - id: tokensRoutes
-          uri: http://localhost:8081
+          uri: lb://resource-server
           predicates:
             - Path=/api/tokens/**
           filters:
             - RemoveRequestHeader=Cookie
         - id: albums-service
-          uri: http://localhost:8082
+          uri: lb://albums-service
           predicates:
-            - Path=/api/albums
+            - Path=/api/albums/**
         - id: photos-service
-          uri: http://localhost:8083
+          uri: lb://photos-service
           predicates:
-            - Path=/api/photos
+            - Path=/api/photos/**
 eureka:
   client:
     service-url:
       default-zone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${instanceId:${random.value}}
+    preferIpAddress: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 20

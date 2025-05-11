@@ -4,13 +4,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import eu.dreamlabs.photos.domains.PhotoResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/photos")
+@RequiredArgsConstructor
 public class PhotosController {
+    private final Environment env;
 
     @GetMapping
     public List<PhotoResponse> getPhotos() {
@@ -33,6 +37,11 @@ public class PhotosController {
                 .build();
 
         return Arrays.asList(photo1, photo2);
+    }
+
+    @GetMapping("/status")
+    public String status() {
+        return env.getProperty("spring.application.name") + "Working on port " + env.getProperty("local.server.port");
     }
 
 }
